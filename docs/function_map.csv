@@ -1,0 +1,89 @@
+rom_address,reconstructed_name,module,confidence,notes
+ffff0000,reset_entry,start.c,high,"Reset vector (not a Ghidra function); full stub decoded: CPU0 gate, warm-boot magic 0xdeadbeaf resume, strap tests, VBAR/SP setup, b bootrom_main. A couple strap-bit meanings UNCERTAIN."
+ffff0138,efuse_count_bits,efuse.c,high,Popcount of eFuse rows 0x13/0x14 to size a field
+ffff01e0,efuse_program_from_desc,efuse.c,high,Programs eFuse from SRAM descriptor
+ffff02bc,secure_boot_header_verify,secure_boot.c,medium,"'RSAK' header check + key-hash compare + SHA/RSA; key-compare path partially approximated"
+ffff04b8,read_security_config,secure_boot.c,high,OTP/eFuse probe; sets g_secure_boot/g_otp_variant/g_key_words
+ffff0698,get_timer_clock,util.c,high,Returns udelay reference clock (SRAM)
+ffff06a4,set_timer_clock,util.c,high,Sets udelay reference clock
+ffff06b0,rom_delay,util.c,high,Clock-scaled busy delay
+ffff0704,rom_delay_ms,util.c,high,Coarse delay (n x 1000 units)
+ffff0b84,sha_start,crypto.c,high,Arm SHA-256 engine for message length
+ffff0bd4,sha_update_dma,crypto.c,high,Feed data to hash via DMA
+ffff0c20,sha_read_digest,crypto.c,high,Read 32-byte digest
+ffff0c68,sha_final_compare,crypto.c,high,Read digest and memcmp vs expected
+ffff0cd0,rsa_load_operands,crypto.c,high,Load 4x256-byte RSA operands
+ffff0db4,rsa_load_and_run,crypto.c,high,Soft-reset + load operands + run modexp
+ffff0ebc,rsa_read_result_cmp,crypto.c,high,Compare RSA result against SHA digest
+ffff0fb0,rsa_verify_signature,crypto.c,medium,Full image signature verify (RSA+SHA)
+ffff1084,crypto_clk_enable,crypto.c,high,Ungate crypto clock (CRU + SGRF)
+ffff10ac,otp_read_proto_a,otp.c,medium,"OTP read protocol A @0xff0a0000/0xff270000; base recovered from immediates"
+ffff13ac,otp_read_proto_b,otp.c,medium,OTP read protocol B @0xff0a0000
+ffff156c,otp_read,otp.c,high,Dispatch to proto A/B by g_otp_variant
+ffff159c,otp_init,otp.c,medium,OTP analog power-up / reset sequence
+ffff18d4,cru_early_init,clock.c,high,Initial CRU clock gate/divider setup
+ffff194c,cru_pll_init,clock.c,high,Raise CPU/bus clock to 200/400 MHz
+ffff1a9c,spiflash_probe,storage_spi.c,high,SPI-NOR probe (RDID 0x9f)
+ffff1bc0,spiflash_probe_alt,storage_spi.c,high,SPI-NAND probe (reset + RDID)
+ffff1c80,spi_xfer,storage_spi.c,high,SPI master transfer (0xff190000)
+ffff1da4,flash_read_sector,storage_spi.c,high,NOR 0x03 / NAND 0x13+0x0f+0x03 read
+ffff1f08,flash_read_image,storage_spi.c,high,Read image in 0x800 chunks
+ffff1f70,flash_find_idb,storage_spi.c,high,Scan flash for IDB magic 0xfcdc8c3b
+ffff2054,mmc_init_sd,storage_mmc.c,high,SD card init (ACMD41/CMD2/3/7)
+ffff220c,emmc_probe,storage_mmc.c,high,eMMC boot-driver probe (host 3)
+ffff2240,mmc_init_mmc,storage_mmc.c,high,eMMC init (CMD1/2/3/7)
+ffff23ec,mmc_wait_ready_cmd,storage_mmc.c,high,CMD13 status gate then issue command
+ffff2468,sd_probe,storage_mmc.c,high,SD boot-driver probe (host 0)
+ffff249c,mmc_set_bus_width,storage_mmc.c,medium,Bus width/clock reprogram
+ffff2548,mmc_wait_cmd_done,storage_mmc.c,high,Start command and poll for completion
+ffff25bc,mmc_transfer,storage_mmc.c,high,"DW-MMC core command+data engine (verified vs disassembly; poll budgets 100001/250001)"
+ffff27e8,mmc_reset_fifo,storage_mmc.c,high,FIFO reset
+ffff282c,mmc_send_cmd,storage_mmc.c,high,Command without data (wraps mmc_transfer)
+ffff283c,mmc_host_init,storage_mmc.c,high,DW-MMC host power/clock/reset
+ffff29b0,mmc_card_init,storage_mmc.c,high,CMD0/CMD8 then SD/MMC dispatch
+ffff2a78,mmc_read_blocks,storage_mmc.c,high,CMD17/18 multi-block read
+ffff2b24,mmc_read_block_lba,storage_mmc.c,high,Single-block read returning address
+ffff2ba0,boot_load_image,boot.c,medium,"Load IDB, RC4-decode, verify, launch; close transliteration"
+ffff2e68,boot_try_devices,boot.c,high,Iterate 4 boot drivers
+ffff2eb4,usb_set_address,usb.c,high,USB SET_ADDRESS handler
+ffff2ef8,usb_get_descriptor,usb.c,high,GET_DESCRIPTOR (device/config)
+ffff301c,usb_ep_stall,usb.c,high,STALL control endpoints
+ffff3048,usb_send_zlp,usb.c,high,Zero-length status ACK
+ffff3054,usb_phy_reset,usb.c,high,USB PHY soft-reset via CRU
+ffff30b4,usb_core_init,usb.c,high,"DWC2 core/FIFO/interrupt init (verified vs disassembly)"
+ffff32b0,usb_ep_rx,usb.c,high,Drain EP OUT FIFO
+ffff32f4,usb_ep_tx,usb.c,high,Fill EP IN FIFO
+ffff3370,gic_enable_usb_irq,usb.c,medium,GICD_ISENABLER write (IRQ enable)
+ffff3384,gic_clear_usb_pending,usb.c,medium,GICD_ICPENDR write (clear pending)
+ffff3398,usb_bus_reset,usb.c,high,Bus reset / connect handler
+ffff3434,gic_irq_handler,usb.c,high,"GIC top half called from the EL3 IRQ vector ffff0a80 (missed by Ghidra: only reached via the vector table). IAR==55 -> usb_isr -> EOIR; EOIR is skipped when the download path jumps to the loaded image"
+ffff3474,usb_isr,usb.c,high,Top-level USB interrupt handler
+ffff355c,usb_ep_dispatch,usb.c,medium,EP0 phase jump-table dispatch
+ffff3658,usb_set_speed,usb.c,high,Enumerated-speed / EP0 max-packet config
+ffff3708,usb_handle_gintsts,usb.c,medium,Service core interrupt bits
+ffff3780,usb_handle_ep_ints,usb.c,medium,Per-endpoint interrupt processing
+ffff3858,usb_rx_data_pump,usb.c,medium,Bulk-OUT download accumulator
+ffff3aa8,usb_handle_setup,usb.c,high,Fetch + parse 8-byte SETUP packet
+ffff3ad0,usb_parse_control_request,usb.c,high,"Standard + vendor (rockusb 0xc, tags 0x471/0x472)"
+ffff3c2c,usb_download_handler,usb.c,medium,Process/verify/launch downloaded blob
+ffff3dfc,usb_otg_init,usb.c,high,Full device-mode USB bring-up
+ffff3e6c,usb_blob_decode,usb.c,high,CRC-16 check + RC4 decode
+ffff3ed8,usb_maskrom_mode,usb.c,high,Enter USB maskrom download mode
+ffff3f0c,crc16_ccitt,util.c,high,CRC-16/CCITT (poly 0x1021)
+ffff3f60,rc4_crypt,crypto.c,high,RC4 stream cipher (fixed Rockchip key)
+ffff3fe4,efuse_read,efuse.c,high,Read eFuse words (0xff0b0000)
+ffff40b8,efuse_program_bits,efuse.c,high,Blow eFuse bits
+ffff4204,efuse_write_verify,efuse.c,high,Program bits then verify
+ffff4288,bootrom_main,boot.c,high,ROM C entry point
+ffff42c4,rom_memcmp,util.c,high,Word-wise memcmp
+ffff439c,crypto_copy_bigint,crypto.c,high,memcpy wrapper staging crypto operands
+ffff43c8,rom_memset,util.c,high,memset
+ffff440c,thunk_memcpy_aligned,util.c,high,Compiler thunk -> memcpy_aligned
+ffff442c,memcpy_aligned,util.c,high,Aligned 16-byte-unrolled copy (internal)
+ffff4480,rom_memcpy,util.c,high,memcpy (alignment-handling entry)
+ffff4554,thunk_memset_words,util.c,high,Compiler thunk -> memset_words
+ffff4560,memset_words,util.c,high,Aligned word/half/byte fill (internal)
+ffff458c,memset_impl,util.c,high,memset head-alignment (internal)
+ffff45d8,delay_spin,util.c,high,Leaf NOP spin
+ffff45e4,cpu_enable_irq_abort,util.c,high,Set SCR_EL3.EA + unmask IRQ
+ffff45f8,jump_to_code,util.c,high,Indirect branch to loaded code
